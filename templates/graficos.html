@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos dos Sensores</title>
+
+    <style>
+        /* Estilo para o canvas do gráfico */
+        #graficoTemperaturaUmidade {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Gráficos de Temperatura e Umidade</h1>
+    
+    <!-- Área para os gráficos -->
+    <canvas id="graficoTemperaturaUmidade"></canvas>
+
+    <script>
+        // Função para buscar os dados do backend
+        async function obterDadosSensores() {
+            const response = await fetch('/dados-sensores-json');
+            const data = await response.json();
+            return data;
+        }
+
+        // Função para renderizar o gráfico
+        async function renderizarGrafico() {
+            const dadosSensores = await obterDadosSensores();
+
+            const ctx = document.getElementById('graficoTemperaturaUmidade').getContext('2d');
+            const grafico = new Chart(ctx, {
+                type: 'line', // Tipo de gráfico (pode ser alterado para 'bar', 'pie', etc)
+                data: {
+                    labels: dadosSensores.timestamp, // Eixo x (timestamps)
+                    datasets: [
+                        {
+                            label: 'Temperatura (°C)',
+                            data: dadosSensores.temperatura, // Dados de temperatura
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            fill: false
+                        },
+                        {
+                            label: 'Umidade (%)',
+                            data: dadosSensores.umidade, // Dados de umidade
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Timestamp'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Valores'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chama a função para renderizar o gráfico assim que a página for carregada
+        renderizarGrafico();
+    </script>
+</body>
